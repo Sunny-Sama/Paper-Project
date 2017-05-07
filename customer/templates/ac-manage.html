@@ -1,0 +1,45 @@
+<style>
+    .ac-mng-table {
+        float: left;
+        width: 200px;
+        border: 1px solid #6596F8;
+        height: 30px;
+        margin:5px 10px 5px 10px;
+        border-radius: 5px;
+    }
+    .ac-mng-name {
+        line-height:30px;
+        margin-left: 15px;
+        width: 150px;
+        overflow: hidden;
+        text-overflow:ellipsis;
+        float: left;
+    }
+
+    .ac-mng-name + a {
+        color: #6596F8;
+        padding-left:5px;
+        line-height:30px;
+        text-decoration: none;
+    }
+</style>
+<div>
+    <div style="margin-bottom: 20px">
+        <a ui-sref="ac-main">&lt;&lt;返回上一页</a>
+    </div>
+    <div style="width: 100%; float: left; margin-bottom: 20px;">
+        <p style="color: #777; font-size: 1.2em; padding-left:10px;">已选数据源</p>
+            <div ng-repeat="table in selectedTables" class="ac-mng-table">
+                <div class="ac-mng-name"><span>{{table.tableName}}</span></div>
+                <a>{{table.level}}级</a>
+            </div>
+    </div>
+    <div>
+        <ul id="myTab" class="nav nav-tabs">
+            <li class="active access-manage-title"><a ui-sref=".user" data-target="#user" data-toggle="tab" style="color: #777;">用户列表</a></li>
+            <li class="access-manage-title"><a ui-sref=".attribute" data-target="#attribute" data-toggle="tab" style="color: #777;">属性列表</a></li>
+        </ul>
+        <div ui-view class="tab-content">
+        </div>
+    </div>
+</div>

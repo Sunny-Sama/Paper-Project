@@ -1,0 +1,202 @@
+<style>
+    /*.console-title.console-title-border {*/
+    /*padding: 16px 0px 13px;*/
+    /*min-height: 0px;*/
+    /*margin-bottom: 14px;*/
+    /*margin-right: 20px;*/
+    /*}*/
+
+    .fdu-main-left {
+        width:21%;
+        float:left;
+    }
+
+    .fdu-main-right {
+        width: 79%;
+        padding-left: 10px;
+        float: right;
+    }
+    .fdu-main-search {
+        padding:0;
+        height: unset;
+        border:1px solid #bbb;
+        border-bottom: none;
+    }
+
+    .fdu-main-input {
+        height: 45px;
+    }
+
+    .fdu-main-catalog {
+        padding:0;
+        border:1px solid #bbb;
+        border-top-color:#e2e2e4;
+        height: 700px; /*TODO: need to change*/
+
+    }
+
+    .ac-operator {
+        font-size: 12px;
+        color: #000000;
+        border: 1px solid #000000;
+        padding-left: 1px;
+        padding-right: 1px;
+        text-decoration: none;
+    }
+
+    .ac-operator:hover {
+        color: #000000;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    .ac-catalog-name {
+        color: #777;
+        text-decoration: none;
+    }
+
+    .ac-ul-list {
+        padding-left: 20px;
+    }
+
+    .fdu-main-tables {
+        padding-top:2px;
+        border: 1px solid #ddd;
+    }
+
+    .ac-showTables {
+        overflow:auto;
+        padding:15px;
+        height: 685px; /*TODO: need to change*/
+    }
+
+    .ac-level-select {
+        color: #777;
+        width: 60px;
+    }
+
+    .ac-table-list{
+        width: 270px;
+        height:70px;
+        border: 1px solid #e2e2e4;
+        margin: 10px;
+        float: left;
+    }
+    #ac-tree > li {
+        padding-bottom:5px;
+    }
+
+    #ac-searchKey {
+        border-radius:0 !important;
+        border: none !important;
+        width:85%;
+    }
+
+    #ac-standardTree {
+        border-radius:0px;
+        margin: 0;
+        width:239px;
+        overflow: hidden;
+        border:none;
+        background-color: white;
+    }
+
+    #ac-standardTree ul {
+        list-style-type:none;
+    }
+
+    #ac-tree {
+        overflow:auto;
+        padding-bottom: 15px;
+        padding-left:0px;
+    }
+
+    #ac-tb-search {
+        width:200px;
+        height:32px;
+        float:left;
+        margin-top:0px;
+        margin-bottom:10px
+    }
+
+    #ac-search-btn{
+        display:inline-block;
+        float:left;
+        margin-top:1px;
+        margin-left:5px;
+        border-radius:5px;
+    }
+</style>
+<div>
+    <!--<div class="console-title console-title-border">-->
+        <!--<h6 style="float:left;"><a href="#"><span class="fa fa-home"></span></a></h6>-->
+        <!--<h6 style="float:left;">目录管理</h6>-->
+        <!--<h6>目录权限管理</h6>-->
+    <!--</div>-->
+    <div class="fdu-main-left">
+        <div class="fdu-main-search">
+            <div class="form-horizontal" role="form">
+                <div class="input-group" style="width: 100%;">
+                    <input type="text" name="ac-searchKey" id="ac-searchKey" placeholder="搜索" class="form-control">
+                    <span><a href="#" class="btn btn-sm"  ng-click="searchCatalog()"><span class="fa fa-search"></span></a></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="fdu-main-catalog">
+            <div id="ac-standardTree" class="tree well">
+                <ul id="ac-tree">
+                    <li ng-repeat="catalog in catalogList" ng-if="catalog.parent_id == -1">
+                        <span ng-if="hasChild(catalog.id) == true"><a ng-click="getChild(catalog.id)" id="id-a-{{catalog.id}}" class="ac-operator">＋</a></span>
+                        <span ng-if="hasChild(catalog.id) == false">&nbsp&nbsp&nbsp&nbsp</span>
+                        <a href="" class="ac-catalog-name" ng-click="getTables(catalog.id)">{{catalog.name}}</a>
+                        <ul ng-if="hasChild(catalog.id) == true" id="id-{{catalog.id}}" class="ac-ul-list"></ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="fdu-main-right">
+        <div class="fdu-main-input">
+            <input id="ac-tb-search" class="form-control" type="text" placeholder="请输入表名搜索">
+            <a id="ac-search-btn" class="btn btn-sm btn-info" type="button" ng-click="searchTable()">查询</a>
+            <div style="float: right; margin-top: 4px;">
+                <span style="color: #777;">数据等级：</span>
+                <select class="ac-level-select" ng-change="changeLow(low)" ng-model="low">
+                    <option value="1">1级</option>
+                    <option value="2">2级</option>
+                    <option value="3">3级</option>
+                    <option value="4">4级</option>
+                    <option value="5">5级</option>
+                    <option value="6">6级</option>
+                </select>
+                <span>&nbsp~&nbsp</span>
+                <select class="ac-level-select" ng-change="changeHigh(high)" ng-model="high">
+                    <option value="1">1级</option>
+                    <option value="2">2级</option>
+                    <option value="3">3级</option>
+                    <option value="4">4级</option>
+                    <option value="5">5级</option>
+                    <option value="6">6级</option>
+                </select>
+            </div>
+        </div>
+        <div class="fdu-main-tables">
+            <div class="ac-showTables" id="ac-showTables">
+                <div class="ac-table-list" ng-repeat="table in tableList" ng-if="table.level >= lowLevel && table.level <= highLevel">
+                    <div style="background-color: rgba(226,226,228,0.63); font-weight: 500"><span style="padding-left:15px;">数据资源名</span><span style="padding-left: 90px;">等级</span><span style="padding-left:25px;">选择</span></div>
+                    <div style="line-height: 50px; margin-left: 15px; width: 150px; overflow: hidden; text-overflow:ellipsis; float: left;"><span>{{table.tableName}}</span></div>
+                    <span style="line-height: 50px; color: #6596F8; margin-left:10px; margin-right:20px;">{{table.level}}级</span>
+                    <input type="checkbox" name="ac-select-list" id="{{table.tableId}}" style="line-height: 50px; width: 15px; height: 15px; margin-left:10px;">
+                </div>
+                <div style="width: 100%;float:left">
+                    <div style="float: right;">
+                        <span style="color: #777; margin-left:30px; line-height:50px ;">全选</span><input type="checkbox" id="ac-select-all" ng-click="selectAll()" style="margin-left: 5px; width: 15px; height:15px">
+                        <a class="btn btn-sm btn-info" type="button" style="margin-right:15px; margin-left:20px;" ng-click="manageTable()">批量管理</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
